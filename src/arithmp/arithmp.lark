@@ -1,0 +1,48 @@
+?start: expr
+    | IDENTIFIER "=" expr -> variable_assignment
+    | IDENTIFIER "=" function -> function_assignment
+
+?expr: ternary
+
+?ternary: cmp
+    | cmp "?" expr ":" ternary -> ternary
+
+?cmp: add
+    | cmp "==" add -> equal
+    | cmp "!=" add -> not_equal
+    | cmp "<" add  -> less
+    | cmp "<=" add -> less_equal
+    | cmp ">" add  -> greater
+    | cmp ">=" add -> greater_equal
+
+?add: mul
+    | add "+" mul -> add
+    | add "-" mul -> sub
+
+?mul: unary
+    | mul "*" unary -> mul
+    | mul "/" unary -> div
+    | mul "%" unary -> mod
+
+?unary: power
+      | "+" unary -> pos
+      | "-" unary -> neg
+
+?power: primary
+      | primary "^" unary -> power
+
+?primary: NUMBER -> number
+        | IDENTIFIER "(" [arguments] ")" -> function_call
+        | IDENTIFIER -> variable
+        | "(" expr ")"
+
+function:  "[" [parameters] "]" "->" expr
+
+arguments: expr ("," expr)*
+parameters: IDENTIFIER ("," IDENTIFIER)*
+
+%import common.CNAME -> IDENTIFIER
+%import common.NUMBER
+%import common.WS_INLINE
+
+%ignore WS_INLINE

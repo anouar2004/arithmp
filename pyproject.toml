@@ -1,0 +1,71 @@
+[project]
+name = "arithmp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "Mikaël Capelle", email = "capelle.mikael@gmail.com" }]
+requires-python = ">=3.13"
+dependencies = ["click>=8.5.0", "lark>=1.3.1", "prompt-toolkit>=3.0.53"]
+
+[project.scripts]
+arithmp = "arithmp.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["poethepoet>=0.48.0", "pytest>=9.1.1", "ruff>=0.17.0", "ty>=0.0.86"]
+
+[tool.poe.tasks]
+format-imports = "ruff check --select I src tests --fix"
+format-ruff = "ruff format src tests"
+format.sequence = ["format-imports", "format-ruff"]
+lint-ruff = "ruff check src tests"
+lint-ruff-format = "ruff format --check src tests"
+lint-ty = "ty check src tests"
+lint.sequence = ["lint-ruff", "lint-ruff-format", "lint-ty"]
+lint.ignore_fail = "return_non_zero"
+
+[tool.ruff.lint]
+extend-select = [
+    "B",      # flake8-bugbear
+    "S",      # flake8-bandit
+    "Q",      # flake8-quotes
+    "I",      # isort
+    "D",      # pydocstyle
+    "ANN",    # flake8-annotations
+    "PYI",    # flake8-pyi
+    "PGH003", # pygrep-hooks/blanket-type-ignore
+]
+
+ignore = [
+    "S301", # suspicious-pickle-usage
+    "S403", # suspicious-pickle-import:
+    "D200", # unnecessary-multiline-docstring
+    "D205", #  missing-blank-line-after-summary
+    "D212", # multi-line-summary-first-line
+]
+preview = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "assert"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ty.analysis]
+strict-literal-narrowing = true
+
+[tool.ty.rules]
+blanket-ignore-comment = "error"
+missing-type-argument = "error"
+possibly-unresolved-reference = "warn"
+unsupported-dynamic-base = "warn"
+
+# required for now due to Quantity implementation
+invalid-type-form = "ignore"
+
+# TODO: keep this or not?
+possibly-missing-attribute = "warn"
+possibly-missing-import = "warn"
